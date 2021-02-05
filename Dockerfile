@@ -1,9 +1,11 @@
 FROM maven:3.6.1-jdk-8-alpine AS MAVEN_BUILD
 
-#RUN apt update && apt upgrade -y
 COPY ./ ./
-RUN mvn clean package
+RUN mvn package
 
-FROM openjdk:8-jre-alpine3.9
-COPY --from=MAVEN_BUILD /metamorphosis-1.6.7/target/metamorphosis-1.6.7.jar /demo.jar
-CMD ["java", "-jar", "/demo.jar"]
+FROM tomcat:8.0-alpine
+#RUN apt install tomcat9
+COPY --from=MAVEN_BUILD target/hello-1.0.war /usr/local/tomcat/webapps/hello-1.0.war
+RUN ls /usr/local/tomcat/webapps/
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
